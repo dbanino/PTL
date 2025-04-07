@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Royal Countdown</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: linear-gradient(to bottom, #ffffff, #e6e6ff);
+      font-family: 'Kanit', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      color: #3c3c3c;
+    }
+
+    #timer {
+      font-size: 2.5em;
+      margin-bottom: 30px;
+      color: #1e1e1e;
+    }
+
+    .corgis {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .corgis img {
+      width: 150px;
+      height: auto;
+    }
+
+    .guards {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 30px;
+    }
+
+    .guards img {
+      width: 120px;
+      height: auto;
+    }
+
+    #celebration {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      z-index: 10;
+      text-align: center;
+    }
+
+    #celebration h2 {
+      font-size: 3em;
+      color: #8b0000;
+      animation: sparkle 2s infinite alternate;
+    }
+
+    #queen {
+      display: none;
+      position: fixed;
+      top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      animation: fadeIn 3s ease-in-out forwards;
+    }
+
+    #queen img {
+      width: 300px;
+      border: 8px solid gold;
+      border-radius: 15px;
+      box-shadow: 0 0 30px gold;
+    }
+
+    @keyframes sparkle {
+      from { text-shadow: 0 0 10px gold; }
+      to { text-shadow: 0 0 20px crimson; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translate(-50%, -30%) scale(0.8); }
+      to { opacity: 1; transform: translate(-50%, 0%) scale(1); }
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 2em; }
+      #timer { font-size: 1.8em; }
+      .corgis img, .guards img { width: 90px; }
+      #queen img { width: 200px; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Royal Countdown Begins</h1>
+  <div id="timer">Loading...</div>
+
+  <div class="corgis">
+    <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Corgi 1">
+    <img src="https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif" alt="Corgi 2">
+    <img src="https://media.giphy.com/media/l1J9EdzfOSgfyueLm/giphy.gif" alt="Corgi 3">
+  </div>
+
+  <div class="guards">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Queen%27s_Guard_2022.jpg/200px-Queen%27s_Guard_2022.jpg" alt="Guard Left">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Queen%27s_Guard_2022.jpg/200px-Queen%27s_Guard_2022.jpg" alt="Guard Right">
+  </div>
+
+  <div id="celebration">
+    <h2>🎺 Long live the countdown! 🇬🇧</h2>
+    <canvas id="confetti"></canvas>
+  </div>
+
+  <div id="queen">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Queen_Elizabeth_II_in_March_2015.jpg/400px-Queen_Elizabeth_II_in_March_2015.jpg" alt="Queen Elizabeth II">
+  </div>
+
+  <audio id="trumpet" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
+
+  <script>
+    const timerEl = document.getElementById("timer");
+    const celebration = document.getElementById("celebration");
+    const trumpet = document.getElementById("trumpet");
+
+    function countdown() {
+      const targetDate = new Date("2025-04-11T03:59:00Z").getTime(); // April 10 @ 11:59 PM EST
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      if (distance <= 0) {
+        triggerRoyalMoment();
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      timerEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+      setTimeout(countdown, 1000);
+    }
+
+    function triggerRoyalMoment() {
+      timerEl.innerHTML = "🎉 It's Royal Time!";
+      celebration.style.display = "flex";
+      trumpet.play();
+      launchConfetti();
+      document.getElementById("queen").style.display = "block";
+    }
+
+    function launchConfetti() {
+      const canvas = document.getElementById("confetti");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      let confetti = Array.from({ length: 150 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        r: Math.random() * 6 + 4,
+        d: Math.random() * 50 + 30,
+        color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+        tilt: Math.random() * 20 - 10
+      }));
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confetti.forEach(c => {
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+          ctx.fillStyle = c.color;
+          ctx.fill();
+        });
+        update();
+        requestAnimationFrame(draw);
+      }
+
+      function update() {
+        confetti.forEach(c => {
+          c.y += 2;
+          c.x += Math.sin(c.y * 0.01);
+          if (c.y > canvas.height) {
+            c.y = -10;
+            c.x = Math.random() * canvas.width;
+          }
+        });
+      }
+
+      draw();
+    }
+
+    window.onload = countdown;
+  </script>
+</body>
+</html>
